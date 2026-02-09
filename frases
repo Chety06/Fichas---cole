@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lectura Proactiva - León</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap');
+        body { font-family: 'Comic Neue', cursive; background-color: #f0f9ff; touch-action: none; overflow-x: hidden; }
+        :fullscreen { background-color: #f0f9ff; padding: 20px; overflow-y: auto; }
+        .letter-tile { cursor: grab; user-select: none; touch-action: none; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col p-4">
+    <div class="max-w-4xl mx-auto w-full flex justify-between items-center mb-6 no-print">
+        <h1 class="text-2xl font-black text-blue-900">Fichas León</h1>
+        <button onclick="document.documentElement.requestFullscreen()" class="bg-blue-600 text-white px-6 py-3 rounded-2xl font-bold shadow-lg">PANTALLA COMPLETA</button>
+    </div>
+    <div id="main-container" class="max-w-4xl mx-auto w-full space-y-12 pb-20"></div>
+    <script>
+        const DATA = [
+            { id: 1, text: "La niña lee un libro", emoji: "👧📖" },
+            { id: 2, text: "El gato bebe mucha leche", emoji: "🐱🥛" },
+            { id: 3, text: "Mi mamá cocina una tarta", emoji: "👩‍🍳🥧" },
+            { id: 4, text: "El perro come su hueso", emoji: "🐶🦴" },
+            { id: 5, text: "El sol brilla muy fuerte", emoji: "☀️😎" },
+            { id: 6, text: "Mi papá lava el coche", emoji: "👨🚗" },
+            { id: 7, text: "El pájaro vuela muy alto", emoji: "🐦☁️" },
+            { id: 8, text: "Yo como una manzana roja", emoji: "🍎😋" },
+            { id: 9, text: "Ella pinta un cuadro bonito", emoji: "🎨🖌️" },
+            { id: 10, text: "El bebé duerme muy bien", emoji: "👶💤" },
+            { id: 11, text: "La abuela hace una sopa", emoji: "👵🍲" },
+            { id: 12, text: "El tren es muy rápido", emoji: "🚂💨" },
+            { id: 13, text: "Las flores son de colores", emoji: "💐🌈" },
+            { id: 14, text: "El león ruge muy fuerte", emoji: "🦁🔊" },
+            { id: 15, text: "La vaca come mucha hierba", emoji: "🐄🌿" },
+            { id: 16, text: "El barco es muy grande", emoji: "🚢🌊" },
+            { id: 17, text: "Mi hermano tiene un perro", emoji: "👦🐕" },
+            { id: 18, text: "La mesa es de madera", emoji: "🪑🪵" },
+            { id: 19, text: "El reloj marca la hora", emoji: "⏰⌚" },
+            { id: 20, text: "La casa tiene dos puertas", emoji: "🏠🚪" },
+            { id: 21, text: "El cielo es muy azul", emoji: "☁️💙" },
+            { id: 22, text: "El sapo salta al agua", emoji: "🐸💧" },
+            { id: 23, text: "La luna brilla de noche", emoji: "🌙✨" },
+            { id: 24, text: "El mono come una banana", emoji: "🐒🍌" },
+            { id: 25, text: "Mi tía vive en León", emoji: "🦁🏰" },
+            { id: 26, text: "El coche rojo es rápido", emoji: "🚗🔴" },
+            { id: 27, text: "El pato nada muy rápido", emoji: "🦆🏊" },
+            { id: 28, text: "Yo tengo cinco años hoy", emoji: "🎂🖐️" },
+            { id: 29, text: "El oso duerme en invierno", emoji: "🐻❄️" },
+            { id: 30, text: "Me gusta mucho mi colegio", emoji: "🏫🎒" }
+        ];
+        function init(){
+            const container = document.getElementById('main-container');
+            DATA.forEach(ex => {
+                const words = ex.text.split(' ');
+                let shuffled = [...words].sort(()=>Math.random()-0.5);
+                container.innerHTML += `
+                    <div class="bg-white p-8 rounded-[2.5rem] shadow-xl border-b-8 border-slate-200">
+                        <div class="flex flex-col md:flex-row items-center gap-8 mb-8">
+                            <div class="text-8xl w-40 h-40 bg-slate-50 rounded-3xl flex items-center justify-center">${ex.emoji}</div>
+                            <div class="flex flex-wrap justify-center gap-3 dropzone-${ex.id}">
+                                ${words.map((w, i) => `<div class="w-32 h-20 bg-slate-100 border-b-4 border-slate-200 rounded-xl flex items-center justify-center text-xl font-bold text-blue-900 target" data-word="${w}"></div>`).join('')}
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap justify-center gap-4 source-${ex.id}">
+                            ${shuffled.map(w => `<div class="letter-tile px-6 py-4 bg-blue-600 text-white rounded-2xl text-xl font-bold shadow-lg shadow-blue-900/20">${w}</div>`).join('')}
+                        </div>
+                    </div>`;
+            });
+            document.querySelectorAll('[class^="source-"]').forEach((s, i) => {
+                const id = DATA[i].id;
+                new Sortable(s, { group: 'g'+id, animation: 150, forceFallback: true });
+                new Sortable(document.querySelector('.dropzone-'+id), { 
+                    group: 'g'+id, animation: 150, forceFallback: true,
+                    onAdd: (evt) => {
+                        if(evt.item.innerText === evt.target.children[evt.newIndex].dataset.word) {
+                            confetti({ particleCount: 30, spread: 50 });
+                        }
+                    }
+                });
+            });
+        }
+        init();
+    </script>
+</body>
+</html>
